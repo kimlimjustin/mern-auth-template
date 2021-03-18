@@ -1,0 +1,7 @@
+.centeredForm {
+    margin: 20px 0;
+    padding: 40px 10px;
+    border-radius: 10px;
+    transition: all .4s;
+    background-color: #F0F0F0;
+}
