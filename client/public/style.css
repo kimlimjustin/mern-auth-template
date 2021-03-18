@@ -5,3 +5,15 @@
     transition: all .4s;
     background-color: #F0F0F0;
 }
+
+.github-login-btn{
+    margin: 1rem auto;
+    width: 100%;
+}
+
+.github-login-btn svg{
+    display: inline-block;
+    width: 1.2rem;
+    vertical-align: sub;
+    margin-right: .5rem;
+}
