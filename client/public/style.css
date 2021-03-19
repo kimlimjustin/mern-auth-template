@@ -8,7 +8,8 @@
 
 .github-login-btn{
     margin: 1rem auto;
-    width: 100%;
+    width: -webkit-fill-available;
+    text-align: center;
 }
 
 .github-login-btn svg{
