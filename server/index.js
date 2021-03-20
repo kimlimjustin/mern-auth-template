@@ -4,22 +4,30 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 
 require('dotenv').config();
+require('./Router/auth')
 
 const app = express();
 const server = http.createServer(app);
+
+app.use(express.json())
+app.use(cors({origin: process.env.CLIENT_URL, optionsSuccessStatus: 200, credentials: true}));
 
 app.use((req, res, next) => {
 	res.setHeader("Access-Control-Allow-Origin", process.env.CLIENT_URL)
 	res.setHeader("Access-Control-Allow-Methods", 'GET, POST, DELETE')
     res.setHeader("Access-Control-Allow-Headers", 'Content-Type', "Authorization")
-    res.header("Access-Control-Allow-Credentials", true)
+    res.setHeader("Access-Control-Allow-Credentials", true)
+    res.header('Content-Type', 'application/json;charset=UTF-8')
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
 	next();
 })
 
-app.use(express.json())
-app.use(cors());
-
-require('./Router/auth')
+const parseJwt = token => {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+    return JSON.parse(jsonPayload);
+}
 
 const USER_ROUTER = require('./Router/user.router');
 

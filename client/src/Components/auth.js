@@ -14,7 +14,7 @@ const parseQueryVariable = (variable, search) => {
 }
 
 const Auth = ({location}) => {
-    const [inputLoginUsername, setInputLoginUsername] = useState('');
+    const [inputLoginEmail, setInputLoginEmail] = useState('');
     const [inputLoginPassword, setInputLoginPassword] = useState('');
     const [inputRegisterEmail, setInputRegisterEmail] = useState('');
     const [inputRegisterUsername, setInputRegisterUsername] = useState('');
@@ -32,14 +32,16 @@ const Auth = ({location}) => {
 
     const Login = e => {
         e.preventDefault()
-        axios.post(`${process.env.REACT_APP_SERVER_URL}/auth/login`, {username: inputLoginUsername, password: inputLoginPassword})
+        axios.post(`${process.env.REACT_APP_SERVER_URL}/auth/login`, {email: inputLoginEmail, password: inputLoginPassword}, {withCredentials: true})
         .then(response => console.log(response))
     }
 
     const Register = e => {
         e.preventDefault()
         axios.post(`${process.env.REACT_APP_SERVER_URL}/auth/register`, {username: inputRegisterUsername, email: inputRegisterEmail, password: inputRegisterPassword})
-        .then(response => console.log(response))
+        .then(response => {
+
+        })
     }
 
     return(
@@ -55,8 +57,8 @@ const Auth = ({location}) => {
                             <div id="login" className="tab-content tab-content-active">
                                 <form onSubmit={Login} method="POST">
                                     <div className="form-group form-animate">
-                                        <label htmlFor="login-username" className="form-label">Username</label>
-                                        <input type="text" className="input-animate" required autoComplete="username" value={inputLoginUsername} onChange = {({target: {value}}) => setInputLoginUsername(value)} />
+                                        <label htmlFor="login-username" className="form-label">Email</label>
+                                        <input type="text" className="input-animate" required autoComplete="email" value={inputLoginEmail} onChange = {({target: {value}}) => setInputLoginEmail(value)} />
                                     </div>
                                     <div className="form-group form-animate">
                                         <label htmlFor="login-password" className="form-label">Password</label>
