@@ -18,3 +18,9 @@
     vertical-align: sub;
     margin-right: .5rem;
 }
+
+.form-error{
+    color: #ff7777;
+    font-family: sans-serif;
+    text-align: center;
+}

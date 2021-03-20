@@ -13,13 +13,17 @@ router.post('/register', async (req, res, next) => {
     passport.authenticate('signup', async(err, user) => {
         try{
             if(err) return next(new Error(err))
-            req.login(user, {session: false}, async (error) => {
-                if(error) return next(error);
-                const body = {_id: user._id, email: user.email, name: user.name, secret_token: user.secret_token};
-                const token = jwt.sign({ user: body }, 'TOP_SECRET');
+            if(user){
+                req.login(user, {session: false}, async (error) => {
+                    if(error) return next(error);
+                    const body = {_id: user._id, email: user.email, name: user.name, secret_token: user.secret_token};
+                    const token = jwt.sign({ user: body }, 'TOP_SECRET');
 
-                return res.cookie('token', jwt.sign({ user: {_id: req.user._id, name: req.user.name, email: req.user.email, secret_token: req.user.secret_token} }, 'TOP_SECRET'), {httpOnly: true}).json({token});
-            })
+                    return res.cookie('token', jwt.sign({ user: {_id: req.user._id, name: req.user.name, email: req.user.email, secret_token: req.user.secret_token} }, 'TOP_SECRET'), {httpOnly: true}).json({token});
+                })
+            }else{
+                return res.status(406).json({"message": "Email has been taken."})
+            }
         }catch(err){
             return next(err);
         }
@@ -30,8 +34,7 @@ router.post('/login', async(req, res, next) => {
         try{
             if(err) return next(new Error(err))
             if(!user){
-                const error = new Error("User not found.");
-                return next(error)
+                return res.status(400).json("User not found.")
             }
             req.login(user, {session: false}, async (error) => {
                 if(error) return next(error);

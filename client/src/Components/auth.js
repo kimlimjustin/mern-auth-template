@@ -20,6 +20,8 @@ const Auth = ({location}) => {
     const [inputRegisterUsername, setInputRegisterUsername] = useState('');
     const [inputRegisterPassword, setInputRegisterPassword] = useState('');
     const [inputRegisterPasswordConfirmation, setInputRegisterPasswordConfirmation] = useState('');
+    const [inputRegisterError, setInputRegisterError] = useState('');
+    const [inputLoginError, setInputLoginError] = useState('');
 
     useEffect(() => {
         if(location.search){
@@ -30,18 +32,38 @@ const Auth = ({location}) => {
         }
     }, [location.search])
 
+    useEffect(() => {
+        if(inputRegisterPassword !== inputRegisterPasswordConfirmation){
+            setInputRegisterError("Password and confirmation must match.")
+        }else{
+            setInputRegisterError("")
+        }
+    }, [inputRegisterPassword, inputRegisterPasswordConfirmation])
+
     const Login = e => {
         e.preventDefault()
         axios.post(`${process.env.REACT_APP_SERVER_URL}/auth/login`, {email: inputLoginEmail, password: inputLoginPassword}, {withCredentials: true})
-        .then(response => console.log(response))
+        .then(response =>{
+            console.log(response)
+            window.location = "/"
+        })
+        .catch(() => {
+            setInputLoginError("Email and/or password does not match.")
+        })
     }
 
     const Register = e => {
         e.preventDefault()
-        axios.post(`${process.env.REACT_APP_SERVER_URL}/auth/register`, {username: inputRegisterUsername, email: inputRegisterEmail, password: inputRegisterPassword})
-        .then(response => {
-
-        })
+        if(inputRegisterPassword === inputRegisterPasswordConfirmation){
+            axios.post(`${process.env.REACT_APP_SERVER_URL}/auth/register`, {username: inputRegisterUsername, email: inputRegisterEmail, password: inputRegisterPassword}, {withCredentials: true})
+            .then(response => {
+                console.log(response)
+                window.location = "/"
+            })
+            .catch(() => {
+                setInputRegisterError("Email has been taken. Please try another.")
+            })
+        }
     }
 
     return(
@@ -55,6 +77,7 @@ const Auth = ({location}) => {
                         </div>
                         <div className="tab-contents" id="formTab">
                             <div id="login" className="tab-content tab-content-active">
+                            <h1 className="form-error">{inputLoginError}</h1>
                                 <form onSubmit={Login} method="POST">
                                     <div className="form-group form-animate">
                                         <label htmlFor="login-username" className="form-label">Email</label>
@@ -74,6 +97,7 @@ const Auth = ({location}) => {
                                 </form>
                             </div>
                             <div id="register" className="tab-content">
+                                <h1 className="form-error">{inputRegisterError}</h1>
                                 <form onSubmit={Register} method="POST">
                                     <div className="form-group form-animate">
                                         <label htmlFor="reg-username" className="form-label">Username</label>
