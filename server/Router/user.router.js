@@ -63,14 +63,16 @@ const parseHeader = cookie => {
 }
 
 router.get('/profile', jsonParser, async (req, res) => {
-    let user =parseJwt(parseHeader(req.headers.cookie).value).user
-    if(user){
-        const isValidUser = await User.exists({name: user.name, email: user.email, secret_token: user.secret_token})
-        if(isValidUser) res.json({"message": "Authenticated", user})
-        else res.status(403).json({"message": "User unauthenticated"})
-    }else{
-        return res.status(403).json("User unauthenticated")
-    }
+    if(req.headers.cookie){
+        let user =parseJwt(parseHeader(req.headers.cookie).value).user
+        if(user){
+            const isValidUser = await User.exists({name: user.name, email: user.email, secret_token: user.secret_token})
+            if(isValidUser) res.json({"message": "Authenticated", user})
+            else return res.json({unauthorized: true})
+        }else{
+            return res.json({unauthorized: true})
+        }
+    }else return res.json({unauthorized: true})
 })
 
 module.exports = router;

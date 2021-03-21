@@ -10,8 +10,10 @@ const App = () => {
 
     useEffect(() => {
         axios.get(`${process.env.REACT_APP_SERVER_URL}/auth/profile`,{withCredentials: true})
-        .then(response => setUserInfo(response))
-        .catch(() => setUserInfo(false))
+        .then(response => {
+            if(!response.data.unauthorized) setUserInfo(response)
+            else setUserInfo(false)
+        })
     }, [])
     return(
         <Router>
