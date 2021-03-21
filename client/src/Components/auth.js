@@ -13,7 +13,7 @@ const parseQueryVariable = (variable, search) => {
     return null
 }
 
-const Auth = ({location}) => {
+const Auth = ({location, userInfo}) => {
     const [inputLoginEmail, setInputLoginEmail] = useState('');
     const [inputLoginPassword, setInputLoginPassword] = useState('');
     const [inputRegisterEmail, setInputRegisterEmail] = useState('');
@@ -31,6 +31,12 @@ const Auth = ({location}) => {
             }
         }
     }, [location.search])
+
+    useEffect(() => {
+        if(userInfo){
+            window.location = "/"
+        }
+    }, [userInfo])
 
     useEffect(() => {
         if(inputRegisterPassword !== inputRegisterPasswordConfirmation){

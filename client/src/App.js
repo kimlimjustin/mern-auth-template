@@ -1,16 +1,26 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
+import axios from "axios";
 
 import {BrowserRouter as Router, Route, Switch} from "react-router-dom";
 import Auth from "./Components/auth";
 import Home from "./Components/home";
 
-const App = () => (
-    <Router>
-        <Switch>
-            <Route exact path = "/" component = {Home} />
-            <Route path = "/auth" component = {Auth} />
-        </Switch>
-    </Router>
-)
+const App = () => {
+    const [userInfo, setUserInfo] = useState('');
+
+    useEffect(() => {
+        axios.get(`${process.env.REACT_APP_SERVER_URL}/auth/profile`,{withCredentials: true})
+        .then(response => setUserInfo(response))
+        .catch(() => setUserInfo(false))
+    }, [])
+    return(
+        <Router>
+            <Switch>
+                <Route exact path = "/" component = {(props) => <Home {...props} userInfo = {userInfo} />} />
+                <Route path = "/auth" component = {(props) => <Auth {...props} userInfo={userInfo} />} />
+            </Switch>
+        </Router>
+    )
+}
 
 export default App;

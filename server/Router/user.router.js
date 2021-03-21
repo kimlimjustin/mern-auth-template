@@ -4,6 +4,8 @@ const bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
 const jwt = require('jsonwebtoken');
 const passport = require('passport');
+const User = require('../Models/user.model');
+global.atob = require('atob');
 
 require('dotenv').config();
 const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID
@@ -47,6 +49,28 @@ router.post('/login', async(req, res, next) => {
             return next(err);
         }
     })(req, res, next);
+})
+
+const parseJwt = token => {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+    return JSON.parse(jsonPayload);
+}
+
+const parseHeader = cookie => {
+    return {key: cookie.split('=')[0], value: cookie.split('=')[1]}
+}
+
+router.get('/profile', jsonParser, async (req, res) => {
+    let user =parseJwt(parseHeader(req.headers.cookie).value).user
+    if(user){
+        const isValidUser = await User.exists({name: user.name, email: user.email, secret_token: user.secret_token})
+        if(isValidUser) res.json({"message": "Authenticated", user})
+        else res.status(403).json({"message": "User unauthenticated"})
+    }else{
+        return res.status(403).json("User unauthenticated")
+    }
 })
 
 module.exports = router;
