@@ -2,6 +2,8 @@ const express = require('express');
 const http = require('http');
 const cors = require('cors');
 const mongoose = require('mongoose');
+const CryptoAES = require('crypto-js/aes');
+const CryptoENC = require('crypto-js/enc-utf8');
 
 require('dotenv').config();
 require('./Router/auth')
@@ -20,6 +22,18 @@ app.use((req, res, next) => {
     res.header('Content-Type', 'application/json;charset=UTF-8')
     res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
 	next();
+})
+
+const decryptFetchingData = (message) => {
+    let msg = CryptoAES.decrypt(message, process.env.SECURITY_KEY);
+    return msg.toString(CryptoENC)
+}
+
+app.use((req, res, next) => {
+    if(req.body.data){
+        req.body = JSON.parse(decryptFetchingData(req.body.data))
+    }
+    next()
 })
 
 const USER_ROUTER = require('./Router/user.router');

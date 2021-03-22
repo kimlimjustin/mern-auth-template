@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import sendSecureRequest from "../Lib/req";
 
 const parseQueryVariable = (variable, search) => {
     var query = search.substring(1);
@@ -48,12 +49,13 @@ const Auth = ({location, userInfo}) => {
 
     const Login = e => {
         e.preventDefault()
-        axios.post(`${process.env.REACT_APP_SERVER_URL}/auth/login`, {email: inputLoginEmail, password: inputLoginPassword}, {withCredentials: true})
+        sendSecureRequest("POST", `${process.env.REACT_APP_SERVER_URL}/auth/login`, {email: inputLoginEmail, password: inputLoginPassword})
         .then(response =>{
             console.log(response)
             window.location = "/"
         })
-        .catch(() => {
+        .catch(err => {
+            console.log(err)
             setInputLoginError("Email and/or password does not match.")
         })
     }

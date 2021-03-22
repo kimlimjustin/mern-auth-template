@@ -34,7 +34,7 @@ router.post('/register', async (req, res, next) => {
 router.post('/login', async(req, res, next) => {
     passport.authenticate('login', async (err, user, info) => {
         try{
-            if(err) return next(new Error(err))
+            if(err) return res.status(400).json("Something went wrong!")
             if(!user){
                 return res.status(400).json("User not found.")
             }
