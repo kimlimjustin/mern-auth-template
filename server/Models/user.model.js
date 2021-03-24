@@ -24,6 +24,20 @@ const UserSchema = new Schema({
         type: String,
         required: true,
         unique: true
+    },
+    third_party:{
+        is_third_party: {
+            type: Boolean,
+            required: true,
+        },
+        provider: {
+            type: String,
+            require: false
+        },
+        access_token: {
+            type: String,
+            required: false
+        }
     }
 }, {
     timestamps: true

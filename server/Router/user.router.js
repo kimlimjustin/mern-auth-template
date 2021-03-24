@@ -75,4 +75,8 @@ router.get('/profile', jsonParser, async (req, res) => {
     }else return res.json({unauthorized: true})
 })
 
+router.post('/oauth', jsonParser, async (req, res) => {
+    console.log(req.body.code)
+})
+
 module.exports = router;

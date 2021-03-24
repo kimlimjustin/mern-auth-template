@@ -25,10 +25,28 @@ const Auth = ({location, userInfo}) => {
     const [inputLoginError, setInputLoginError] = useState('');
 
     useEffect(() => {
+        document.querySelectorAll(".tab").forEach(tab => {
+            tab.childNodes.forEach(btn => {
+                //Checking if btn is a valid element containing tab-btn class
+                if(btn.classList && btn.classList.contains("tab-btn")){
+                    btn.addEventListener("click", () => {
+                        document.querySelectorAll(".tab-content").forEach(content => {
+                            if(content.parentElement.id === tab.dataset.tab){
+                                content.style.display = "none";
+                            }
+                        })
+                        document.getElementById(btn.dataset.content).style.display = "block"
+                    })
+                }
+            })
+        })
+    })
+
+    useEffect(() => {
         if(location.search){
             const code = parseQueryVariable('code',location.search)
             if(code){
-                console.log(code)
+                sendSecureRequest("POST", `${process.env.REACT_APP_SERVER_URL}/auth/oauth`, {code})
             }
         }
     }, [location.search])
