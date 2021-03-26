@@ -18,8 +18,14 @@ const sendSecureRequest = async (method, url, data) => {
     }else if(method === "POST"){
         let res = null;
         axios.post(url, {data:encryptFetchingData(JSON.stringify(data))}, {withCredentials: true})
-        .then(response => res = response)
-        .then(err => res = {error: true, err})
+        .then(response =>{
+            console.log(response)
+            res = response
+        })
+        .catch(err =>{
+            console.log(err)
+            res = {error: true, err}
+        })
         if(res && res.error) return new Error(res.err);
         else return res;
     }

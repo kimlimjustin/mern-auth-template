@@ -8,7 +8,8 @@
 
 .github-login-btn{
     margin: 1rem auto;
-    width: -webkit-fill-available;
+    width: calc(fit-content + 10rem);
+    padding: 0 2rem;
     text-align: center;
 }
 

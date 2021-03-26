@@ -5,11 +5,19 @@ const jsonParser = bodyParser.json();
 const jwt = require('jsonwebtoken');
 const passport = require('passport');
 const User = require('../Models/user.model');
+const axios = require('axios');
 global.atob = require('atob');
 
 require('dotenv').config();
 const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID
-const GITHUB_SECRET_ID = process.env.GITHUB_SECRET_ID
+const GITHUB_SECRET_ID = process.env.GITHUB_CLIENT_SECRET
+
+const SECURITY_KEY = require('random-token').create(new Date())(10)
+
+const generateToken = (n) => {
+    const randomToken = require('random-token').create(SECURITY_KEY);
+    return randomToken(n);
+}
 
 router.post('/register', async (req, res, next) => {
     passport.authenticate('signup', async(err, user) => {
@@ -75,8 +83,26 @@ router.get('/profile', jsonParser, async (req, res) => {
     }else return res.json({unauthorized: true})
 })
 
-router.post('/oauth', jsonParser, async (req, res) => {
-    console.log(req.body.code)
+router.post('/oauth', jsonParser, (req, res) => {
+    const code = req.body.code;
+    axios.post('https://github.com/login/oauth/access_token', {client_id: GITHUB_CLIENT_ID, client_secret: GITHUB_SECRET_ID, code}, {headers: {accept: 'application/json' }})
+    .then(result => {
+        const access_token = result.data.access_token;
+        if(access_token){
+            axios.get('https://api.github.com/user', {headers: {Authorization: `token ${access_token}`}})
+            .then(userResponse => {
+                User.exists({email: userResponse.data.email}, (err, exist) => {
+                    if(!exist){
+                        const newUser = new User({email: userResponse.data.email, name: userResponse.data.name, password: generateToken(12), secret_token: generateToken(10), third_party: {is_third_party: true, provider: "GitHub", access_token: access_token}})
+                        newUser.save()
+                        .then(() => res.json(newUser))
+                    }else{
+                        return res.json({"message": "Hi"})
+                    }
+                })
+            })
+        }else return res.status(400).json({"message": "Access token required"})
+    })
 })
 
 module.exports = router;
