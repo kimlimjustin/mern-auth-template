@@ -9,19 +9,6 @@ const encryptFetchingData = data => {
     return encrypted.toString();
 }
 
-
-const parseQueryVariable = (variable, search) => {
-    var query = search.substring(1);
-    var vars = query.split('&');
-    for (var i = 0; i < vars.length; i++) {
-        var pair = vars[i].split('=');
-        if (decodeURIComponent(pair[0]) === variable) {
-            return decodeURIComponent(pair[1]);
-        }
-    }
-    return null
-}
-
 const Auth = ({location, userInfo}) => {
     const [inputLoginEmail, setInputLoginEmail] = useState('');
     const [inputLoginPassword, setInputLoginPassword] = useState('');
@@ -49,18 +36,6 @@ const Auth = ({location, userInfo}) => {
             })
         })
     },[])
-
-    useEffect(() => {
-        if(location.search){
-            const code = parseQueryVariable('code',location.search)
-            console.log(code)
-            if(code){
-                axios.post(`${process.env.REACT_APP_SERVER_URL}/auth/oauth`, {data: encryptFetchingData({code})}, {withCredentials: true})
-                .then(response => console.log(response))
-                .catch(() => {})
-            }
-        }
-    }, [location.search])
 
     useEffect(() => {
         if(userInfo){
