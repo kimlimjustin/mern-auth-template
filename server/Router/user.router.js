@@ -95,9 +95,15 @@ router.post('/oauth', jsonParser, (req, res) => {
                     if(!exist){
                         const newUser = new User({email: userResponse.data.email, name: userResponse.data.name, password: generateToken(12), secret_token: generateToken(10), third_party: {is_third_party: true, provider: "GitHub", access_token: access_token}})
                         newUser.save()
-                        .then(() => res.json(newUser))
+                        .then(() => {
+                            return res.cookie('token', jwt.sign({ user: {_id: newUser._id, name: newUser.name, email: newUser.email, secret_token: newUser.secret_token} }, 'TOP_SECRET'), {httpOnly: true}).json({"message": "Signed up successfully"});
+                        })
                     }else{
-                        return res.json({"message": "Hi"})
+                        User.findOne({email: userResponse.data.email}, (err, user) => {
+                            if(user){
+                                return res.cookie('token', jwt.sign({ user: {_id: user._id, name: user.name, email: user.email, secret_token: user.secret_token} }, 'TOP_SECRET'), {httpOnly: true}).json({"message": "Signed in successfully"});
+                            }
+                        })
                     }
                 })
             })

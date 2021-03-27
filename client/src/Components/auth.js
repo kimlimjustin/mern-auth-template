@@ -1,6 +1,14 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import sendSecureRequest from "../Lib/req";
+import CryptoAES from "crypto-js/aes";
+
+const SECURITY_KEY = process.env.REACT_APP_SECURITY_KEY;
+
+const encryptFetchingData = data => {
+    const encrypted = CryptoAES.encrypt(JSON.stringify(data), SECURITY_KEY);
+    return encrypted.toString();
+}
+
 
 const parseQueryVariable = (variable, search) => {
     var query = search.substring(1);
@@ -47,8 +55,9 @@ const Auth = ({location, userInfo}) => {
             const code = parseQueryVariable('code',location.search)
             console.log(code)
             if(code){
-                sendSecureRequest("POST", `${process.env.REACT_APP_SERVER_URL}/auth/oauth`, {code})
+                axios.post(`${process.env.REACT_APP_SERVER_URL}/auth/oauth`, {data: encryptFetchingData({code})}, {withCredentials: true})
                 .then(response => console.log(response))
+                .catch(() => {})
             }
         }
     }, [location.search])
@@ -68,15 +77,12 @@ const Auth = ({location, userInfo}) => {
     }, [inputRegisterPassword, inputRegisterPasswordConfirmation])
 
     const Login = e => {
-        console.log(e.target)
         e.preventDefault()
-        sendSecureRequest("POST", `${process.env.REACT_APP_SERVER_URL}/auth/login`, {email: inputLoginEmail, password: inputLoginPassword}, {withCredentials: true})
+        axios.post(`${process.env.REACT_APP_SERVER_URL}/auth/login`, {data: encryptFetchingData({email: inputLoginEmail, password: inputLoginPassword})}, {withCredentials: true})
         .then(response =>{
-            console.log(response)
-            //window.location = "/"
+            window.location = "/"
         })
         .catch(err => {
-            console.log(err)
             setInputLoginError("Email and/or password does not match.")
         })
     }
@@ -84,9 +90,8 @@ const Auth = ({location, userInfo}) => {
     const Register = e => {
         e.preventDefault()
         if(inputRegisterPassword === inputRegisterPasswordConfirmation){
-            axios.post(`${process.env.REACT_APP_SERVER_URL}/auth/register`, {username: inputRegisterUsername, email: inputRegisterEmail, password: inputRegisterPassword}, {withCredentials: true})
+            axios.post(`${process.env.REACT_APP_SERVER_URL}/auth/register`, {data: encryptFetchingData({username: inputRegisterUsername, email: inputRegisterEmail, password: inputRegisterPassword})}, {withCredentials: true})
             .then(response => {
-                console.log(response)
                 window.location = "/"
             })
             .catch(() => {
