@@ -111,4 +111,8 @@ router.post('/oauth', jsonParser, (req, res) => {
     })
 })
 
+router.post('/logout', jsonParser, (req, res) => {
+    return res.cookie('token', '', {maxAge: 0}).json({"message": "Logged out"})
+})
+
 module.exports = router;

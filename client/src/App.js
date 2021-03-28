@@ -5,6 +5,7 @@ import {BrowserRouter as Router, Route, Switch} from "react-router-dom";
 import Auth from "./Components/auth";
 import Home from "./Components/home";
 import OAuth from "./Components/oauth";
+import Logout from "./Components/logout";
 
 const App = () => {
     const [userInfo, setUserInfo] = useState('');
@@ -22,6 +23,7 @@ const App = () => {
                 <Route exact path = "/" component = {(props) => <Home {...props} userInfo = {userInfo} />} />
                 <Route path = "/auth" component = {(props) => <Auth {...props} userInfo={userInfo} />} />
                 <Route path = "/oauth" component = {OAuth} />
+                <Route path = "/logout" component = {Logout} />
             </Switch>
         </Router>
     )
