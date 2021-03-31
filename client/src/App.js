@@ -6,6 +6,12 @@ import Auth from "./Components/auth";
 import Home from "./Components/home";
 import OAuth from "./Components/oauth";
 import Logout from "./Components/logout";
+import Crypto from "crypto-js";
+
+const decryptFetchingData = (message) => {
+    let msg = Crypto.AES.decrypt(message, process.env.REACT_APP_SECURITY_KEY);
+    return msg.toString(Crypto.enc.Utf8)
+}
 
 const App = () => {
     const [userInfo, setUserInfo] = useState('');
@@ -13,7 +19,11 @@ const App = () => {
     useEffect(() => {
         axios.get(`${process.env.REACT_APP_SERVER_URL}/auth/profile`,{withCredentials: true})
         .then(response => {
-            if(!response.data.unauthorized) setUserInfo(response)
+            if(!response.data.unauthorized){
+                if(response.data.encrypted){
+                    setUserInfo(JSON.parse(decryptFetchingData(response.data.user)).data)
+                }
+            }
             else setUserInfo(false)
         })
     }, [])

@@ -6,6 +6,8 @@ const jwt = require('jsonwebtoken');
 const passport = require('passport');
 const User = require('../Models/user.model');
 const axios = require('axios');
+const CryptoAES = require('crypto-js/aes');
+//const CryptoENC = require('crypto-js/enc-utf8');
 global.atob = require('atob');
 
 require('dotenv').config();
@@ -17,6 +19,11 @@ const SECURITY_KEY = require('random-token').create(new Date())(10)
 const generateToken = (n) => {
     const randomToken = require('random-token').create(SECURITY_KEY);
     return randomToken(n);
+}
+
+const encryptFetchingData = data => {
+    const encrypted = CryptoAES.encrypt(JSON.stringify({data}), process.env.SECURITY_KEY);
+    return encrypted.toString();
 }
 
 router.post('/register', async (req, res, next) => {
@@ -75,7 +82,7 @@ router.get('/profile', jsonParser, async (req, res) => {
         let user =parseJwt(parseHeader(req.headers.cookie).value).user
         if(user){
             const isValidUser = await User.exists({name: user.name, email: user.email, secret_token: user.secret_token})
-            if(isValidUser) res.json({"message": "Authenticated", user})
+            if(isValidUser) res.json({"message": "Authenticated", user: encryptFetchingData(user), encrypted: true})
             else return res.json({unauthorized: true})
         }else{
             return res.json({unauthorized: true})
