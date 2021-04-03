@@ -17,7 +17,7 @@
         - Store your MongoDB Atlas URI inside `ATLAS_URI` variable.
         - Store your client URL inside `CLIENT_URL` variable.
         - Store your GitHub Client ID inside `GITHUB_CLIENT_ID` variable.
-        - Store your GitHub Client Secret inside `GITHUB_CLIENT_SERVER` variable.
+        - Store your GitHub Client Secret inside `GITHUB_CLIENT_SECRET` variable.
         - Store your security inside `SECURITY_KEY` variable. Note that this value must same as the `REACT_APP_SECURITY_APP` inside the `client/.env` file.
 - Running this program
     - Client side: on the `client` directory, type `npm start`
