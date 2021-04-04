@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import CryptoAES from "crypto-js/aes";
 
 const SECURITY_KEY = process.env.REACT_APP_SECURITY_KEY;
@@ -22,6 +22,7 @@ const encryptFetchingData = data => {
 }
 
 const OAuth = ({location}) => {
+    const [error, setError] = useState('');
     useEffect(() => {
         if(location.search){
             const code = parseQueryVariable('code',location.search)
@@ -31,12 +32,23 @@ const OAuth = ({location}) => {
                 .then(response => {
                     if(response) window.location = "/"
                 })
-                .catch(() => {})
+                .catch(err => {
+                    console.log(err.response.data)
+                    if(err.response.data.status === "001"){
+                        setError("The email of your OAuth has been registered but not linked to your OAuth. Please try with another Email or OAuth.")
+                    }else if(err.response.data.status === "000"){
+                        setError("Access Token Required.")
+                    }
+                })
             }
         }
     }, [location.search])
     return(
+        <>
+        {!error?
         <h1>Loading...</h1>
+        :<h3 className="form-error">{error}</h3>}
+        </>
     )
 }
 
